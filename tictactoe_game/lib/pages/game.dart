@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+
+
 
 class Game extends StatefulWidget {
   const Game({Key? key});
@@ -11,6 +14,7 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   bool _isVisible = false;
+
   static const Duration fadeInDuration = Duration(milliseconds: 700);
   @override
   void initState() {
@@ -59,7 +63,7 @@ class _GameState extends State<Game> {
           child: Column(
             children: [
               Expanded(
-                flex: 1,
+                flex: 2,
                 child: Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -84,7 +88,7 @@ class _GameState extends State<Game> {
                 ),
               ),
               Expanded(
-                flex: 4,
+                flex: 8,
                 child: GridView.builder(
                   itemCount: 9,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -123,44 +127,6 @@ class _GameState extends State<Game> {
                       ),
                     );
                   },
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$result',
-                        style: customFontWhite,
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.orangeAccent,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.red, width: 2),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              _clearBoard();
-                            },
-                            borderRadius: BorderRadius.circular(20),
-                            child: Ink(
-                              padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                              child: Text(
-                                'Play Again',
-                                style: TextStyle(fontSize: 20, color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -272,6 +238,57 @@ class _GameState extends State<Game> {
     else if(winnerFound == false && filledBoxes == 9){
       result = 'It\'s a Draw';
       UnMatchedIndexes.addAll([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    }
+
+    if (winnerFound) {
+      // Show an AwesomeDialog when a winner is found
+      Future.delayed(Duration(milliseconds: 200), () {
+        String title;
+        if (result.contains('Wins')) {
+          title = "Congratulations!";
+          AwesomeDialog(
+            context: context,
+            dialogType: result.contains('O')
+                ? DialogType.SUCCES
+                : DialogType.ERROR,
+            animType: AnimType.SCALE,
+            title: title,
+            desc: result,
+            btnOkOnPress: () {
+              _clearBoard();
+            },
+            btnOkText: "Play Again",
+          )..show();
+        } else {
+          title = "It's a Draw";
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.SCALE,
+            title: title,
+            desc: result,
+            btnOkOnPress: () {
+              _clearBoard();
+            },
+            btnOkText: "Play Again",
+          )..show();
+        }
+      });
+    } else if (filledBoxes == 9) {
+      // Show an AwesomeDialog when it's a draw
+      Future.delayed(Duration(milliseconds: 500), () {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.INFO,
+          animType: AnimType.SCALE,
+          title: "It's a Draw",
+          desc: result,
+          btnOkOnPress: () {
+            _clearBoard();
+          },
+          btnOkText: "Play Again",
+        )..show();
+      });
     }
   }
 
