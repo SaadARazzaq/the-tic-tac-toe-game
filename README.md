@@ -14,6 +14,7 @@ Welcome to Tic Tac Toe Game, a classic game built with Flutter. This simple and 
 ## Gameplay
 
 [![Gameplay](https://img.youtube.com/vi/BTgtn5xGrZs/0.jpg)](https://www.youtube.com/watch?v=BTgtn5xGrZs "Gameplay")
+***Added More functionalities like the home screen and awesome dialog
 
 
 ## Getting Started
