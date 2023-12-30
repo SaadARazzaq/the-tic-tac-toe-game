@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-
-
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class Game extends StatefulWidget {
   const Game({Key? key});
@@ -13,17 +13,41 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
+
   bool _isVisible = false;
+
+  late BannerAd _bannerAd;
+  bool _isAdLoaded = false;  
 
   static const Duration fadeInDuration = Duration(milliseconds: 700);
   @override
   void initState() {
     super.initState();
+    _initBannerAd();
+
     Timer(Duration.zero, () {
       setState(() {
         _isVisible = true;
       });
     });
+  }
+
+  _initBannerAd() {
+    _bannerAd = BannerAd(
+      size: AdSize.banner, 
+      adUnitId: "ca-app-pub-3940256099942544/6300978111", 
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {},
+      ), 
+      request: AdRequest(),
+    );
+
+    _bannerAd.load();
   }
 
   List<String> display_token = [
@@ -53,41 +77,87 @@ class _GameState extends State<Game> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFFBEE5D3), // Mint Lavender color
-      body: AnimatedOpacity(
-        opacity: _isVisible ? 1.0 : 0.0,
-        duration: fadeInDuration,
-        child: Padding(
-          padding: const EdgeInsets.all(19),
-          child: Column(
+      return Scaffold(
+        backgroundColor: Color(0xFF1BE6AF),
+        body: AnimatedOpacity(
+          opacity: _isVisible ? 1.0 : 0.0,
+          duration: fadeInDuration,
+          child: Padding(
+            padding: const EdgeInsets.all(19),
+            child: Column(
             children: [
-              Expanded(
-                flex: 2,
-                child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text('Player O', style: customFontWhite),
-                          Text(oScore.toString(), style: customFontWhite)
-                        ],
-                      ),
-                      SizedBox(width: 50),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text('Player X', style: customFontWhite),
-                          Text(xScore.toString(), style: customFontWhite)
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
+              
+              // Expanded(
+              //   flex: 4,
+              //   child: Container(
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //       children: [
+              //         Column(
+              //           mainAxisAlignment: MainAxisAlignment.end,
+              //           children: [
+              //             Text('Player O', style: customFontWhite),
+              //             Text(oScore.toString(), style: customFontWhite),
+              //           ],
+              //         ),
+              //         SizedBox(width: 40),
+              //         Column(
+              //           mainAxisAlignment: MainAxisAlignment.end,
+              //           children: [
+              //             Text('Player X', style: customFontWhite),
+              //             Text(xScore.toString(), style: customFontWhite),
+              //           ],
+              //         ),
+              //       ],
+              //     ),
+              //     padding: EdgeInsets.only(bottom: 60),
+              //   ),
+              // ),
+            Expanded(
+  flex: 4,
+  child: Padding(
+    padding: EdgeInsets.only(top: 70),
+  child: Column(
+    children: [
+      Container(
+        color: Colors.red, // Red line color
+        height: 3, // Red line height
+        width: double.infinity,
+      ),
+      Container(
+        color: Color(0xFFFFD700), // Yellow background color
+        padding: EdgeInsets.symmetric(vertical: 6), // Adjust padding as needed
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text('Player O', style: customFontWhite),
+                Text(oScore.toString(), style: customFontWhite),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text('Player X', style: customFontWhite),
+                Text(xScore.toString(), style: customFontWhite),
+              ],
+            ),
+          ],
+        ),
+      ),
+      Container(
+        color: Colors.red, // Red line color
+        height: 3, // Red line height
+        width: double.infinity,
+      ),
+    ],
+  ),
+  ),
+),
+    
+                Expanded(
                 flex: 8,
                 child: GridView.builder(
                   itemCount: 9,
@@ -129,13 +199,48 @@ class _GameState extends State<Game> {
                   },
                 ),
               ),
+              Padding(
+  padding: const EdgeInsets.only(bottom: 100),
+  child: Container(
+    width: double.infinity,
+    height: 60,
+    decoration: BoxDecoration(
+      color: MatchedIndexes.isNotEmpty
+          ? Color(0xFFE3E0F3) // Lavender color
+          : (UnMatchedIndexes.isNotEmpty ? Colors.white : Colors.yellow),
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(
+        width: 5,
+        color: Colors.red, // Red border color
+      ),
+    ),
+    child: TextButton(
+      onPressed: () {
+        _clearBoard();
+      },
+      child: Text(
+        "Start Over",
+        style: TextStyle(
+          color: Colors.red,
+          fontFamily: GoogleFonts.bangers().fontFamily,
+          fontSize: 26,
+        ),
+      ),
+    ),
+  ),
+),
             ],
           ),
         ),
       ),
+      bottomNavigationBar: _isAdLoaded ? Container(
+        height: _bannerAd.size.height.toDouble(),
+        width: _bannerAd.size.width.toDouble(),
+        child: AdWidget(ad: _bannerAd),
+      )
+      : SizedBox(),
     );
   }
-
   void _tapped(int index){
     if (winnerFound || display_token[index] != '') {
       return; // Ignore further tapping

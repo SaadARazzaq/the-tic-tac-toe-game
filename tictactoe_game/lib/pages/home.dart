@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
   );
   static var customFontPurple = GoogleFonts.poppins(
     textStyle: TextStyle(
-      color: Colors.purpleAccent,
+      color: Colors.black,
       letterSpacing: 3,
       fontSize: 18,
     ),
@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFBEE5D3),
+      backgroundColor: Color(0xFF1BE6AF),
       body: AnimatedOpacity(
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _isVisible ? fadeInDuration : fadeOutDuration,
@@ -68,6 +68,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             Container(
+              padding: EdgeInsets.only(bottom: 100),
               alignment: Alignment.bottomCenter,
               child: Text(
                 "By FastDev",
